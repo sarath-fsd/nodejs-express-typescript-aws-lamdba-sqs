@@ -1,0 +1,28 @@
+service: aws-sqs-send-receive-message-node-typescript-sendgrid
+
+provider:
+  name: aws
+  runtime: nodejs18.x
+  region: us-east-1
+  environment:
+    updateQueueAccountId:
+    updateQueueName: 'updateEmailStatusQueue'
+    updateQueueRegion: 'us-east-1'
+    sendEmailQueueAccountId:
+    sendEmailQueueName: 'emailQueue'
+    sendEmailQueueRegion: 'us-east-1'
+    sendEmailFrom: 'aws-lambda-sqs-email@test.com'
+    sendGridKey: ''
+  iam:
+    role:
+      statements:
+        - Effect: Allow
+          Action: 'sqs:SendMessage'
+          Resource: 'arn:aws:sqs:${self:provider.environment.updateQueueRegion}:${self:provider.environment.updateQueueAccountId}:${self:provider.environment.updateQueueName}'
+
+functions:
+  sendEmail:
+    handler: dist/handler.sendEmail
+    events:
+      - sqs:
+          arn: 'arn:aws:sqs:${self:provider.environment.sendEmailQueueRegion}:${self:provider.environment.sendEmailQueueAccountId}:${self:provider.environment.sendEmailQueueName}'
