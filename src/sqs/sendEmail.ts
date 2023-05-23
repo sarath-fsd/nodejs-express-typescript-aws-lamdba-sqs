@@ -5,14 +5,13 @@ import { MAIL_STATUS, updateStatus } from './updateStatus';
 
 const receiver: SQSHandler = async (event) => {
   try {
-    const { updateQueueAccountId, updateQueueName, updateQueueRegion } = process.env;
-
-    console.log('Env variables:', process.env);
+    const { UPDATE_NOTIFICATION_STATUS_QUEUE_ACCOUNT_ID, UPDATE_NOTIFICATION_STATUS_QUEUE_NAME, UPDATE_NOTIFICATION_STATUS_QUEUE_REGION } =
+      process.env;
 
     const updateStatusQueueDetails = {
-      accountId: updateQueueAccountId!,
-      queueName: updateQueueName!,
-      region: updateQueueRegion!,
+      accountId: UPDATE_NOTIFICATION_STATUS_QUEUE_ACCOUNT_ID!,
+      queueName: UPDATE_NOTIFICATION_STATUS_QUEUE_NAME!,
+      region: UPDATE_NOTIFICATION_STATUS_QUEUE_REGION!,
     };
 
     let updateStatusDetails = {
@@ -26,9 +25,9 @@ const receiver: SQSHandler = async (event) => {
     for (const record of event.Records) {
       try {
         const { messageAttributes, body } = record;
-        const { triggerEmailNotification } = messageAttributes;
+        const { triggerEmailNotificationRequestId } = messageAttributes;
 
-        updateStatusDetails.requestId = triggerEmailNotification.stringValue!;
+        updateStatusDetails.requestId = triggerEmailNotificationRequestId.stringValue!;
 
         const { to, subject, htmlMessage, attachments, bcc } = JSON.parse(body) as TriggerEmailProps;
 
@@ -36,7 +35,7 @@ const receiver: SQSHandler = async (event) => {
 
         updateStatusDetails.status = MAIL_STATUS.SUCCESS;
       } catch (error) {
-        console.log('Error occured while sending an email: ', error);
+        console.log('Error occurred while sending an email: ', error);
         updateStatusDetails.status = MAIL_STATUS.FAILED;
       }
 

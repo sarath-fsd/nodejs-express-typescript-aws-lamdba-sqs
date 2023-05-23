@@ -3,26 +3,28 @@ service: aws-sqs-send-receive-message-node-typescript-sendgrid
 provider:
   name: aws
   runtime: nodejs18.x
+  stage: DEV
   region: us-east-1
   environment:
-    updateQueueAccountId:
-    updateQueueName: 'updateEmailStatusQueue'
-    updateQueueRegion: 'us-east-1'
-    sendEmailQueueAccountId:
-    sendEmailQueueName: 'emailQueue'
-    sendEmailQueueRegion: 'us-east-1'
-    sendEmailFrom: 'aws-lambda-sqs-email@test.com'
-    sendGridKey: ''
+    UPDATE_NOTIFICATION_STATUS_QUEUE_ACCOUNT_ID:
+    UPDATE_NOTIFICATION_STATUS_QUEUE_NAME: 'updateNotificationStatusQueue'
+    UPDATE_NOTIFICATION_STATUS_QUEUE_REGION: 'us-east-1'
+
+    SEND_EMAIL_QUEUE_ACCOUNT_ID:
+    SEND_EMAIL_QUEUE_NAME: 'emailQueue'
+    SEND_EMAIL_QUEUE_REGION: 'us-east-1'
+
+    EMAIL_FROM: 'aws-lambda-sqs-email@test.com'
+    SEND_GRID_KEY: ''
   iam:
     role:
       statements:
         - Effect: Allow
           Action: 'sqs:SendMessage'
-          Resource: 'arn:aws:sqs:${self:provider.environment.updateQueueRegion}:${self:provider.environment.updateQueueAccountId}:${self:provider.environment.updateQueueName}'
-
+          Resource: 'arn:aws:sqs:${self:provider.environment.UPDATE_NOTIFICATION_STATUS_QUEUE_REGION}:${self:provider.environment.UPDATE_NOTIFICATION_STATUS_QUEUE_ACCOUNT_ID}:${self:provider.environment.UPDATE_NOTIFICATION_STATUS_QUEUE_NAME}'
 functions:
   sendEmail:
     handler: dist/handler.sendEmail
     events:
       - sqs:
-          arn: 'arn:aws:sqs:${self:provider.environment.sendEmailQueueRegion}:${self:provider.environment.sendEmailQueueAccountId}:${self:provider.environment.sendEmailQueueName}'
+          arn: 'arn:aws:sqs:${self:provider.environment.SEND_EMAIL_QUEUE_REGION}:${self:provider.environment.SEND_EMAIL_QUEUE_ACCOUNT_ID}:${self:provider.environment.SEND_EMAIL_QUEUE_NAME}'

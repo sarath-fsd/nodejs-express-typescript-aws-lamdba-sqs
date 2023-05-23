@@ -9,17 +9,19 @@ export interface TriggerEmailProps {
   attachments?: AttachmentData[];
 }
 
+const envConfig = process.env;
+
 const emailConfig = {
   pollingEnabled: false,
   enabled: true,
-  from: process.env.sendEmailFrom || 'awslambda.email@test.com',
+  from: envConfig.EMAIL_FROM || 'awslambda.email@test.com',
   sendgrid: {
-    key: process.env.sendGridKey!,
+    key: envConfig.SEND_GRID_KEY!,
   },
 };
 
 export class SendGridEmail {
-  static async send(emailProps: TriggerEmailProps) {
+  static async send(emailProps: TriggerEmailProps) {    
     console.log('Send method called with params: ', JSON.stringify(emailProps));
 
     const { to, bcc, subject, htmlMessage, attachments } = emailProps;

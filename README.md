@@ -2,7 +2,9 @@
 
 ## Description
 
-Nodejs Express app to receive message (mail details) from AWS SQS and trigger an email using sendgrid and update the status in another AWS SQS queue as a message
+Nodejs Express app to receive message (mail details) from AWS SQS and trigger an email using sendgrid and update the status in another AWS SQS queue as a message.
+
+(Express is being used if you would like to run this app as Rest API.)
 
 ## Major Technologies
 
@@ -50,14 +52,14 @@ $ serverless create -t aws-nodejs
 Add values for the following environment variables in the serverless.yaml file
 
 ```
-    # Create a SQS queue with the name as "emailQueue" get the id from the arn then assign to the "sendEmailQueueAccountId".
-    sendEmailQueueAccountId:
+    # Create a SQS queue with the name as "emailQueue" get the id from the arn then assign to the "SEND_EMAIL_QUEUE_ACCOUNT_ID".
+    SEND_EMAIL_QUEUE_ACCOUNT_ID:
 
-    # Create an account in the SendGrid, get the key and then assign to the "sendGridKey".   If you would like to use gmail smtp, please make the necessary changes in the code.
-    sendGridKey: ''
+    # Create an account in the SendGrid, get the key and then assign to the "SEND_GRID_KEY".   If you would like to use gmail smtp, please make the necessary changes in the code.
+    SEND_GRID_KEY: ''
 
-    # Create a SQS queue with the name as "updateEmailStatusQueue" get the id from the arn then assign to the "updateQueueAccountId".
-    updateQueueAccountId:
+    # Create a SQS queue with the name as "updateNotificationStatusQueue" get the id from the arn then assign to the "UPDATE_NOTIFICATION_STATUS_QUEUE_ACCOUNT_ID".
+    UPDATE_NOTIFICATION_STATUS_QUEUE_ACCOUNT_ID:
 
 ```
 
@@ -68,7 +70,7 @@ $ npm run build
 $ serverless deploy
 ```
 
-## Steps to add an message (mail details) to the "sendEmail" SQS
+## Steps to add an message (mail details) to the "emailQueue" SQS
 
 After successfully running above steps, AWS function name will be displayed in the terminal as below.
 
@@ -93,16 +95,16 @@ sendEmail: aws-sqs-send-receive-message-node-typescript-sendgrid-sendEmail
 > Click on "Message Attributes"
 
 > Enter the following details
-    triggerEmailNotification (in the name textbox)
-    1 (in the value textbox)
+    triggerEmailNotificationRequestId (in the name textbox)
+    1 (in the value textbox.   This can be any number.  Which you would see in the "updateNotificationStatusQueue" after sending an email)
 
-> Click on the "Send Message" button.   This step should trigger lambda function and send a mail then update the status in the "updateEmailStatusQueue"
+> Click on the "Send Message" button.   This step should trigger lambda function and send a mail then update the status in the "updateNotificationStatusQueue"
 ```
 
-## Steps to view the message (send mail status details) in the "updateEmailStatusQueue" SQS
+## Steps to view the message (send mail status details) in the "updateNotificationStatusQueue" SQS
 
 ```bash
-> Navigate to the AWS SQS then select "updateEmailStatusQueue"
+> Navigate to the AWS SQS then select "updateNotificationStatusQueue"
 
 > Click on the "Send and receive messages"
 
